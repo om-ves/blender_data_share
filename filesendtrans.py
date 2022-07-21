@@ -1,37 +1,23 @@
-import tqdm
-import os
-import socket
+import sys
 
-SEPERATOR = "<SEPERATOR>"
+from socket import *
 
-bfrsz = 4026 
+s = socket(AF_INET,SOCK_DGRAM)
+host =sys.argv[1]
+port = 9999
+buf =1024
+addr = (host,port)
 
-host = "192.168.0.112"
+file_name="/Users/sanjaygupta/Documents/Blender/Assets"
 
-port = 8000 
+s.sendto(file_name,addr)
 
-file_name = "untitled.blend"
-
-filesize = os.path.getsize(file_name)
-
-s= socket.socket()
-
-s.connect((host , port))
-
-s.send(f"{file_name}{SEPERATOR}{filesize}".encode())
-
-
-#for the visual representation of the progress of data transfer 
-
-progress = tqdm.tqdm(range(filesize), f"Sending {file_name}", unit="B", unit_scale=True, unit_divisor=1024)
-with open(file_name, "rb") as f:
-    while True:
-        bytes_read = f.read(bfrsz)
-        if not bytes_read:
-
-            break
-
-
-        s.sendall(bytes_read)
-        progress.update(len(bytes_read))
+f=open(file_name,"rb")
+data = f.read(buf)
+while (data):
+    if(s.sendto(data,addr)):
+        print("Sendingg ...... ")
+        data = f.read(buf)
 s.close()
+f.close()
+
